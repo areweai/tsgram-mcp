@@ -1,0 +1,53 @@
+# Python (legacy)
+/venv
+__pycache__/
+/.idea
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+coverage/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Configuration files with sensitive data
+config/bing.json
+config/hugchat.json
+
+# Temporary files
+tmp/
+temp/
+
+# Generated QR codes and output files
+signal-qr-code*.png
+*.qr
+*.png

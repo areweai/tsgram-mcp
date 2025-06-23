@@ -1,0 +1,93 @@
+version: "3.9"
+
+# Remote deployment configuration for Linux servers
+# Optimized for x86_64 architecture with multi-stage builds
+
+services:
+  signal-cli-remote:
+    image: bbernhard/signal-cli-rest-api:latest
+    container_name: signal-cli-remote
+    platform: linux/amd64
+    ports:
+      - "8080:8080"
+    volumes:
+      - signal-data-remote:/home/.local/share/signal-cli
+    environment:
+      - MODE=json-rpc
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - signal-network
+
+  signal-bot-remote:
+    build:
+      context: .
+      dockerfile: Dockerfile.remote
+      target: production
+    container_name: signal-bot-remote
+    platform: linux/amd64
+    depends_on:
+      signal-cli-remote:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - SIGNAL_API_URL=http://signal-cli-remote:8080
+      - SIGNAL_PHONE_NUMBER=${SIGNAL_PHONE_NUMBER}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - DEFAULT_MODEL=${DEFAULT_MODEL:-openrouter}
+      - MCP_SERVER_PORT=3000
+      - REST_SERVER_PORT=8081
+      - LOG_LEVEL=info
+    ports:
+      - "3000:3000"  # MCP server
+      - "8081:8081"  # REST API
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - signal-network
+
+  # Nginx reverse proxy for production
+  nginx-remote:
+    image: nginx:alpine
+    container_name: nginx-remote
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - signal-bot-remote
+    restart: unless-stopped
+    networks:
+      - signal-network
+
+volumes:
+  signal-data-remote:
+    driver: local
+    driver_opts:
+      type: none
+      device: /opt/tsgram/data
+      o: bind
+
+networks:
+  signal-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "hermes-remote": {
+      "command": "curl",
+      "args": [
+        "-X", "POST",
+        "http://localhost:3000/mcp",
+        "-H", "Content-Type: application/json",
+        "-d", "@-"
+      ],
+      "env": {
+        "HERMES_ENDPOINT": "http://localhost:3000"
+      }
+    }
+  }
+}

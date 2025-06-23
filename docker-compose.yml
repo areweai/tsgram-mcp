@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  signal-cli:
+    image: bbernhard/signal-cli-rest-api:latest
+    container_name: signal-cli-service
+    ports:
+      - "8080:8080"
+    volumes:
+      - signal-data:/home/.local/share/signal-cli
+    environment:
+      - MODE=json-rpc
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  signal-bot:
+    build: .
+    container_name: tsgram-bot
+    depends_on:
+      signal-cli:
+        condition: service_healthy
+    environment:
+      - SIGNAL_API_URL=http://signal-cli:8080
+      - SIGNAL_PHONE_NUMBER=${SIGNAL_PHONE_NUMBER}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+    volumes:
+      - ./config:/app/config
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  signal-data:
+    driver: local

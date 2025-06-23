@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "hermes": {
+      "command": "npx",
+      "args": ["tsx", "src/mcp-server.ts"],
+      "cwd": "/Users/edunc/Documents/gitz/tsgram-mcp",
+      "env": {}
+    }
+  }
+}

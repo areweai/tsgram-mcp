@@ -1,0 +1,115 @@
+{
+  "family": "${TASK_FAMILY}",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::${ACCOUNT_ID}:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::${ACCOUNT_ID}:role/signal-aichat-task-role",
+  "containerDefinitions": [
+    {
+      "name": "signal-api",
+      "image": "bbernhard/signal-cli-rest-api:latest",
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "MODE",
+          "value": "json-rpc"
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "signal-data",
+          "containerPath": "/home/.local/share/signal-cli"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8080/v1/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/signal-aichat-${ENVIRONMENT}",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "signal-api",
+          "awslogs-create-group": "true"
+        }
+      }
+    },
+    {
+      "name": "signal-bot",
+      "image": "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${IMAGE_TAG}",
+      "environment": [
+        {
+          "name": "SIGNAL_API_URL",
+          "value": "http://localhost:8080"
+        },
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "LOG_LEVEL",
+          "value": "info"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "SIGNAL_PHONE_NUMBER",
+          "valueFrom": "arn:aws:ssm:${AWS_REGION}:${ACCOUNT_ID}:parameter/signal-aichat/${ENVIRONMENT}/phone"
+        },
+        {
+          "name": "OPENAI_API_KEY",
+          "valueFrom": "arn:aws:ssm:${AWS_REGION}:${ACCOUNT_ID}:parameter/signal-aichat/${ENVIRONMENT}/openai-key"
+        },
+        {
+          "name": "OPENROUTER_API_KEY",
+          "valueFrom": "arn:aws:ssm:${AWS_REGION}:${ACCOUNT_ID}:parameter/signal-aichat/${ENVIRONMENT}/openrouter-key"
+        }
+      ],
+      "dependsOn": [
+        {
+          "containerName": "signal-api",
+          "condition": "HEALTHY"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:3000/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/signal-aichat-${ENVIRONMENT}",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "signal-bot",
+          "awslogs-create-group": "true"
+        }
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "name": "signal-data",
+      "host": {}
+    }
+  ]
+}

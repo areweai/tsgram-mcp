@@ -1,0 +1,11 @@
+{
+  "tools": {
+    "bash": {
+      "maxOutputLines": 60
+    },
+    "mcp": {
+      "defaultExpanded": true,
+      "maxLines": 60
+    }
+  }
+}

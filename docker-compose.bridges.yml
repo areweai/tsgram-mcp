@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Telegram to Claude Bridge
+  telegram-to-claude-bridge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: telegram-claude-bridge
+    ports:
+      - "4041:4041"
+    environment:
+      - NODE_ENV=production
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TG_CLAUDE_WEBHOOK_PORT=4041
+      - WEBHOOK_BASE_URL=${WEBHOOK_BASE_URL:-http://localhost:4041}
+      - LOG_LEVEL=info
+    volumes:
+      - ./.env:/app/.env:ro
+      - claude-pipe:/tmp/claude-pipe
+    command: ["npm", "run", "tg-claude-bridge"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4041/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - claude-bridge-network
+
+  # CLI to Telegram Bridge (for responses)
+  cli-telegram-bridge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cli-telegram-bridge
+    environment:
+      - NODE_ENV=production
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - LOG_LEVEL=info
+    volumes:
+      - ./.env:/app/.env:ro
+    stdin_open: true
+    tty: true
+    command: ["npm", "run", "cli-bridge"]
+    networks:
+      - claude-bridge-network
+
+volumes:
+  claude-pipe:
+    driver: local
+
+networks:
+  claude-bridge-network:
+    driver: bridge

@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # Enhanced TSGram MCP with workspace and rsync
+  tsgram-mcp-workspace:
+    image: tsgram:latest
+    container_name: tsgram-mcp-workspace
+    ports:
+      - "873:873"    # Rsync daemon
+      - "4040:4040"  # MCP server
+      - "4041:4041"  # MCP webhook server
+    volumes:
+      # Mount current directory to project-specific path
+      - .:/app/workspaces/${PROJECT_NAME:-tsgram}
+      # Mount .env for credentials
+      - ./.env:/app/.env:ro
+      # Data persistence (shared across projects)
+      - tsgram-data:/app/data
+      # Workspace root for multi-project support
+      - tsgram-workspaces:/app/workspaces
+    environment:
+      - NODE_ENV=production
+      - PROJECT_NAME=${PROJECT_NAME:-tsgram}
+      - WORKSPACE_ROOT=/app/workspaces
+      - WORKSPACE_PATH=/app/workspaces/${PROJECT_NAME:-tsgram}
+      - SYNC_ENABLED=true
+      - RSYNC_HOST=host.docker.internal
+      - RSYNC_PORT=8873
+      - MCP_SERVER_PORT=4040
+      - MCP_WEBHOOK_PORT=4041
+      - MCP_SERVER_HOST=0.0.0.0
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AUTHORIZED_USER=duncanist
+      - AUTHORIZED_CHAT_ID=5988959818
+      - DEFAULT_MODEL=openrouter
+      - CLEAR_MESSAGE_HISTORY=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - tsgram-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4040/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  tsgram-workspace:
+    driver: local
+  tsgram-data:
+    driver: local
+  tsgram-workspaces:
+    driver: local
+
+networks:
+  tsgram-network:
+    driver: bridge

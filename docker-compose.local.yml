@@ -1,0 +1,97 @@
+version: "3.9"
+
+# Local development configuration for Apple Silicon Mac
+# Optimized for arm64 architecture with development features
+
+services:
+  signal-cli-local:
+    image: bbernhard/signal-cli-rest-api:latest
+    container_name: signal-cli-local
+    platform: linux/arm64
+    ports:
+      - "8080:8080"
+    volumes:
+      - signal-data-local:/home/.local/share/signal-cli
+      - ./config/signal:/config:rw
+    environment:
+      - MODE=json-rpc
+      - JAVA_OPTS=-Xmx256m -Xms128m
+      - DEBUG=true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - signal-network-local
+
+  signal-bot-local:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+      target: development
+    container_name: signal-bot-local
+    platform: linux/arm64
+    depends_on:
+      signal-cli-local:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=development
+      - SIGNAL_API_URL=http://signal-cli-local:8080
+      - SIGNAL_PHONE_NUMBER=${SIGNAL_PHONE_NUMBER}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - DEFAULT_MODEL=${DEFAULT_MODEL:-openrouter}
+      - MCP_SERVER_PORT=3000
+      - REST_SERVER_PORT=8081
+      - LOG_LEVEL=debug
+      - DEBUG=true
+    ports:
+      - "3000:3000"  # MCP server
+      - "8081:8081"  # REST API
+      - "9229:9229"  # Node.js debugger
+    volumes:
+      - .:/app:cached
+      - /app/node_modules
+      - ./config:/app/config:rw
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - signal-network-local
+    # Enable development features
+    stdin_open: true
+    tty: true
+
+  # Redis for local development caching
+  redis-local:
+    image: redis:7-alpine
+    container_name: redis-local
+    platform: linux/arm64
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data-local:/data
+    restart: unless-stopped
+    networks:
+      - signal-network-local
+
+volumes:
+  signal-data-local:
+    driver: local
+  redis-data-local:
+    driver: local
+
+networks:
+  signal-network-local:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

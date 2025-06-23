@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "signal-aichat": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "tsx",
+        "src/mcp-server.ts"
+      ],
+      "env": {}
+    }
+  }
+}

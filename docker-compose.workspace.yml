@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # MCP Workspace with rsync and file editing
+  mcp-workspace:
+    build:
+      context: .
+      dockerfile: Dockerfile.workspace
+    container_name: mcp-workspace
+    ports:
+      - "873:873"    # Rsync daemon
+      - "4043:4040"  # MCP server (different port to avoid conflict)
+    volumes:
+      # Mount workspace as a volume for persistence
+      - workspace-data:/app/workspace
+      # Mount configs
+      - ./docker/rsyncd.conf:/etc/rsyncd.conf:ro
+      - ./docker/rsyncd.secrets:/etc/rsyncd.secrets:ro
+      # For development - mount source
+      - ./src:/app/src:ro
+      - ./package.json:/app/package.json:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+    environment:
+      - NODE_ENV=production
+      - WORKSPACE_PATH=/app/workspace
+      - SYNC_ENABLED=true
+      - RSYNC_HOST=host.docker.internal
+      - RSYNC_PORT=8873
+      - MCP_SERVER_PORT=4040
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - workspace-network
+    healthcheck:
+      test: ["CMD", "pgrep", "rsync"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Local rsync server (runs on host machine)
+  # This is started separately with: npm run rsync:local
+
+volumes:
+  workspace-data:
+    driver: local
+
+networks:
+  workspace-network:
+    driver: bridge

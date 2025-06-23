@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "telegram-mcp": {
+      "command": "npx",
+      "args": ["tsx", "src/mcp-docker-proxy.ts"],
+      "cwd": "/Users/edunc/Documents/gitz/tsgram-mcp",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  }
+}

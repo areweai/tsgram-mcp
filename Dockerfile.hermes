@@ -1,0 +1,56 @@
+FROM node:18
+
+WORKDIR /app
+
+# Install system dependencies for Signal and native builds
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    build-essential \
+    libssl-dev \
+    pkg-config \
+    curl \
+    wget \
+    default-jdk \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up Python for node-gyp
+RUN ln -sf /usr/bin/python3 /usr/bin/python
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install dependencies (including Signal deps)
+RUN npm install
+
+# Install missing dependencies for HTTP server
+RUN npm install node-fetch@^3.3.2 @types/node-fetch@^2.6.11 openai@^4.72.0
+
+# Copy all source code
+COPY src/ ./src/
+COPY .env ./
+
+# Skip build for MCP-only mode - run directly with tsx
+# RUN npm run build
+
+# Create health check script
+RUN echo 'const http = require("http"); \
+const options = { host: "localhost", port: 4040, path: "/health", timeout: 2000 }; \
+const req = http.request(options, (res) => process.exit(res.statusCode === 200 ? 0 : 1)); \
+req.on("error", () => process.exit(1)); \
+req.end();' > health.js
+
+# Expose ports
+EXPOSE 4040 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD node health.js
+
+# Default command - run the Telegram MCP + Webhook server
+# This provides:
+# 1. MCP Server for Claude Code integration
+# 2. HTTP Webhook for automatic AI responses
+# 3. Hermes AI chat integration
+CMD ["npx", "tsx", "src/telegram-mcp-webhook-server.ts"]

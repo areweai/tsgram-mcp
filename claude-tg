@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# CLAUDE-TG: Claude Code CLI with Telegram Forwarding
+# Usage: claude-tg [any claude command arguments]
+# This is a drop-in replacement for 'claude' that forwards responses to Telegram
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+
+# Execute the full bash script
+exec "$SCRIPT_DIR/claude-with-telegram.sh" "$@"

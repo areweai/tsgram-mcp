@@ -1,0 +1,57 @@
+FROM node:20-alpine
+
+# Install rsync, inotify-tools for file watching, and build dependencies
+RUN apk add --no-cache \
+    rsync \
+    inotify-tools \
+    openssh \
+    bash \
+    git \
+    python3 \
+    make \
+    g++
+
+# Create workspace and app directories
+RUN mkdir -p /app/workspace /app/src /app/scripts
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files first for better caching
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy TypeScript source files
+COPY src/ ./src/
+COPY tsconfig.json ./
+
+# Copy rsync configuration
+COPY docker/rsyncd.conf /etc/rsyncd.conf
+COPY docker/rsyncd.secrets /etc/rsyncd.secrets
+RUN chmod 600 /etc/rsyncd.secrets
+
+# Copy sync scripts
+COPY docker/sync-watcher.sh /app/scripts/
+COPY docker/start-workspace.sh /app/scripts/
+RUN chmod +x /app/scripts/*.sh
+
+# Create log directory
+RUN mkdir -p /var/log/rsync
+
+# Expose ports
+EXPOSE 873   
+# Rsync daemon
+EXPOSE 4040  
+# MCP server
+EXPOSE 22   
+ # SSH (optional)
+
+# Environment variables
+ENV WORKSPACE_PATH=/app/workspace
+ENV NODE_ENV=production
+ENV SYNC_ENABLED=true
+
+# Start script that runs both MCP server and file watcher
+CMD ["/app/scripts/start-workspace.sh"]

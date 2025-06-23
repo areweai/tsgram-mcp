@@ -1,0 +1,60 @@
+FROM node:20-alpine
+
+# Install dependencies for rsync, file watching, and build tools
+RUN apk add --no-cache \
+    rsync \
+    inotify-tools \
+    openssh \
+    bash \
+    curl \
+    git \
+    python3 \
+    make \
+    g++
+
+# Create directories
+RUN mkdir -p /app/workspace /app/src /app/scripts /app/data /var/log/rsync
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files first for better caching
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy TypeScript source files
+COPY src/ ./src/
+
+# Copy configuration files
+COPY .env.example .env
+COPY docker/rsyncd.conf /etc/rsyncd.conf
+COPY docker/rsyncd.secrets /etc/rsyncd.secrets
+RUN chmod 600 /etc/rsyncd.secrets
+
+# Copy scripts
+COPY docker/sync-watcher.sh /app/scripts/
+COPY docker/start-tsgram-workspace.sh /app/scripts/
+RUN chmod +x /app/scripts/*.sh
+
+# Build TypeScript
+RUN npm run build || echo "Build step skipped"
+
+# Expose ports
+EXPOSE 873
+EXPOSE 4040
+EXPOSE 8080
+
+# Environment variables
+ENV NODE_ENV=production
+ENV WORKSPACE_PATH=/app/workspace
+ENV SYNC_ENABLED=true
+ENV MCP_SERVER_PORT=4040
+ENV MCP_SERVER_HOST=0.0.0.0
+ENV AUTHORIZED_USER=duncist
+ENV AUTHORIZED_CHAT_ID=5988959818
+
+# Start script
+CMD ["/app/scripts/start-tsgram-workspace.sh"]
