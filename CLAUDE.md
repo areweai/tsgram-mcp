@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-TSGram is a TypeScript/Node.js system that enables communication between Claude Code sessions and Telegram. It includes a Telegram bot with automatic AI responses, MCP server for Claude Code integration, and CLI-to-Telegram forwarding capabilities. The system runs in Docker containers and provides secure, filtered communication between Claude Code CLI and Telegram.
+TSGram MCP (`tsgram-mcp`) is a TypeScript/Node.js system that enables communication between Claude Code sessions and Telegram. It includes a Telegram bot with automatic AI responses, MCP server for Claude Code integration, and CLI-to-Telegram forwarding capabilities. The system runs in Docker containers and provides secure, filtered communication between Claude Code CLI and Telegram.
+
+**Note**: The repository name `signal-aichat` reflects the project's original scope that included Signal integration, but Signal functionality has been archived due to platform limitations.
 
 ## Architecture
 
@@ -12,25 +14,35 @@ TSGram is a TypeScript/Node.js system that enables communication between Claude 
 
 #### Telegram System (Primary)
 - **src/telegram-mcp-webhook-server.ts**: Main Telegram MCP server with AI auto-responses
+- **src/telegram-bot-ai-powered.ts**: Main AI-powered Telegram bot (deployed in Docker)
 - **src/telegram/bot-client.ts**: Telegram Bot API client implementation
 - **src/types/telegram.ts**: Telegram-specific type definitions
 - **src/mcp-docker-proxy.ts**: MCP proxy for Claude Code → Docker communication
 
-#### CLI-to-Telegram Bridge
+#### Bridge System
 - **src/cli-telegram-bridge.ts**: Secure CLI response forwarding to Telegram
+- **src/telegram-to-claude-bridge.ts**: Bridge for Telegram messages to Claude
+- **src/telegram-claude-queue.ts**: Queue management for Telegram-Claude communication
 - **claude-with-telegram.sh**: Bash wrapper for Claude Code CLI
 - **claude-tg**: Global command (symlinked to `/usr/local/bin/claude-tg`)
 
+#### Development Dashboard
+- **src/spa/**: React-based web dashboard (runs on port 3000)
+- **vite.spa.config.ts**: Dashboard build configuration
+- Real-time monitoring of bots and services
+
 #### Signal System (Archived)
-- Moved to `/signal/` directory due to platform limitations
-- See `/signal/BLOCKED_UNTIL_SIGNAL_FIXES_MANUAL_QR.md` for details
+- Located in `/docs/signal/` directory (completely non-functional)
+- See `/docs/signal/BLOCKED_UNTIL_SIGNAL_FIXES_MANUAL_QR.md` for details
+- Signal integration abandoned due to platform limitations
 
 #### Shared Components
 - **src/models/**: AI model implementations
   - `ChatModel.ts`: Factory class for AI model instances
   - `OpenAIAPI.ts`, `OpenRouterAPI.ts`: Model-specific implementations
-- **src/utils/ChatHistory.ts`: Conversation history management
+- **src/utils/ChatHistory.ts**: Conversation history management
 - **src/types/**: TypeScript type definitions
+- **scripts/**: Deployment and testing automation scripts
 
 ### Message Flow
 
@@ -79,8 +91,9 @@ All CLI responses are automatically filtered to remove:
 ### Target Configuration
 
 Responses are sent to:
-- **Chat ID**: Configured via `AUTHORIZED_CHAT_ID` environment variable
+- **Chat ID**: Configured via `AUTHORIZED_CHAT_ID` environment variable (numeric user ID from @userinfobot)
 - **Format**: Professional MCP-branded messages
+- **Security**: Uses numeric user ID instead of username for authorization (more secure)
 
 ### Integration with Claude Code
 
@@ -97,75 +110,104 @@ claude-tg "analyze this codebase"
 
 ## Development Commands
 
-### Telegram System
+### Docker Deployment (Primary)
 
 ```bash
-# Start Telegram MCP server in Docker
-docker-compose -f docker-compose.tsgram.yml up -d
+# Build and start main services
+npm run docker:build
+npm run docker:start
 
-# Check Docker container status
+# Check service status
+npm run docker:health
 docker ps --filter name=tsgram
-docker logs tsgram-mcp-workspace
 
-# Test CLI forwarding
-npm run cli-bridge test
-echo "Test message" | npm run cli-bridge
+# View logs
+npm run docker:logs
 
-# Health check
+# Stop services
+npm run docker:stop
+
+# Rebuild after changes
+npm run docker:rebuild
+```
+
+### Development Services
+
+```bash
+# Start web dashboard
+npm run dashboard            # Runs on http://localhost:3000
+
+# Start individual services
+npm run mcp                  # MCP server (port 4040)
+npm run cli-bridge          # CLI-to-Telegram bridge
+npm run tg-claude-bridge     # Telegram-to-Claude bridge
+npm run telegram-queue       # Queue management
+
+# Health checks
+npm run health-check         # Check ports 4040 and 4041
 curl http://localhost:4040/health
 ```
 
-### Setup and Build
+### Build and Testing
+
 ```bash
+# Install and build
 npm install                    # Install dependencies
-npm run build                 # Build TypeScript to JavaScript
+npm run build                 # Build all components
+npm run build:mcp             # Build MCP server only
+npm run build:spa             # Build dashboard only
+
+# Type checking and linting
 npm run type-check            # TypeScript type checking
 npm run lint                  # Lint code with ESLint
+npm run lint:fix              # Auto-fix linting issues
+
+# Testing
+npm test                      # Run Vitest tests
+npm run test:ui               # Run tests with UI
 ```
 
-### Running the Bot
-```bash
-npm run dev                   # Development mode with hot reload
-npm start                     # Production mode
-npx tsgram start              # CLI command
-```
+### Setup and Configuration
 
-### CLI Commands
 ```bash
-npx tsgram init               # Initialize configuration
-npx tsgram models             # List available models
-npx tsgram test -m gpt -t "Hello"  # Test model
-npx tsgram mcp                # Start MCP server
-```
+# Initial setup
+npm run setup                 # Run setup script
+npm run setup:interactive     # Interactive setup
 
-### Testing
-```bash
-npm test                      # Run Jest tests
-npm run test:watch           # Run tests in watch mode
-```
+# MCP configuration for Claude Code/Desktop
+npm run mcp:configure         # Configure MCP settings
+npm run mcp:test              # Test MCP connection
+npm run mcp:status            # Check MCP status
 
-### Docker Development
-```bash
-docker build -t tsgram:latest -f Dockerfile.tsgram-workspace .
-docker-compose -f docker-compose.tsgram-workspace.yml up -d
+# Maintenance
+npm run fix-permissions       # Fix file permissions
+npm run update                # Update system
+npm run update-context        # Update AI context files
 ```
 
 ## Configuration
 
 ### Environment Variables (.env file)
 
-- `TELEGRAM_BOT_TOKEN`: Bot token from BotFather
-- `AUTHORIZED_CHAT_ID`: Telegram user ID authorized to use bot (more secure than usernames)
+**Required:**
+- `TELEGRAM_BOT_TOKEN`: Bot token from @BotFather
+- `AUTHORIZED_CHAT_ID`: **Numeric user ID** from @userinfobot (e.g., `123456789`)
+
+**AI Provider (choose one):**
+- `OPENROUTER_API_KEY`: OpenRouter API key for Claude access (recommended)
+- `OPENAI_API_KEY`: OpenAI API key for GPT models
+
+**Optional:**
 - `DISABLED_MODELS`: Comma-separated list of models to disable
 - `DEFAULT_MODEL`: Model to use when no trigger is specified
-- `OPENAI_API_KEY`: OpenAI API key for GPT models
-- `OPENAI_API_BASE`: Custom OpenAI API base URL (optional)
+- `OPENAI_API_BASE`: Custom OpenAI API base URL
 - `OPENAI_MODEL`: OpenAI model to use (default: gpt-4-turbo-preview)
-- `OPENROUTER_API_KEY`: OpenRouter API key for Claude access
 - `MCP_SERVER_NAME`: MCP server name (default: tsgram)
 - `MCP_SERVER_VERSION`: MCP server version (default: 1.0.0)
 - `NODE_ENV`: Environment (development/production)
 - `LOG_LEVEL`: Logging level (info/debug/error)
+
+**Security Note**: `AUTHORIZED_CHAT_ID` must be a numeric user ID (not username) for security. Get it from [@userinfobot](https://t.me/userinfobot) on Telegram.
 
 ### Configuration Files
 
@@ -178,17 +220,24 @@ docker-compose -f docker-compose.tsgram-workspace.yml up -d
 ### Runtime Dependencies
 - `@modelcontextprotocol/sdk`: MCP server implementation
 - `telegraf`: Telegram Bot API framework
+- `react` + `react-dom`: Dashboard web interface
+- `@tanstack/react-router`: Dashboard routing
 - `commander`: CLI framework
 - `dotenv`: Environment variable management
 - `openai`: OpenAI API client
 - `zod`: Schema validation
 - `axios`: HTTP client for API calls
+- `express`: Web server for health checks and webhooks
+- `ws`: WebSocket support
 
 ### Development Dependencies
 - `typescript`: TypeScript compiler
 - `tsx`: TypeScript execution for development
+- `vite`: Build tool and dev server
+- `@vitejs/plugin-react`: React plugin for Vite
 - `eslint`: Code linting
-- `jest`: Testing framework
+- `vitest`: Testing framework (replaces Jest)
+- `tailwindcss`: CSS framework for dashboard
 - `@types/node`: Node.js type definitions
 
 ## MCP Server Integration
@@ -226,40 +275,50 @@ The MCP server provides Claude Code with access to workspace files and Telegram 
 5. Update environment variable documentation
 6. Add model-specific tests
 
-## Common Development Tasks
+## Docker Architecture
 
-### Adding a New CLI Command
-1. Add command definition in `src/cli.ts`
-2. Implement command handler function
-3. Add help text and options
-4. Update README documentation
+The system runs in a multi-service Docker environment:
 
-### Extending MCP Server Functionality
-1. Add new tool/resource/prompt to `src/mcp-server.ts`
-2. Implement handler methods
-3. Update schema definitions
-4. Test with Claude Code integration
+### Main Services
+- **Port 4040**: MCP server (telegram-mcp-webhook-server)
+- **Port 4041**: Webhook server 
+- **Port 873**: Rsync server for file synchronization
+- **Port 3000**: Web dashboard (React SPA)
 
-### Environment Setup
-1. Copy `.env.example` to `.env`
-2. Configure required API keys and settings
-3. Run `npx tsgram init` to create config files
-4. Test with `npx tsgram models`
+### Workspace Integration
+- Docker container mounts workspace directories
+- Real-time file sync between host and container via rsync
+- Multi-project support with workspace switching
+- Security filtering prevents access to sensitive files
 
-## Type Safety and Code Quality
+### Deployment Lifecycle
+1. `npm run docker:build` - Build container with latest code
+2. `npm run docker:start` - Start all services via docker-compose
+3. `npm run docker:health` - Verify services are running
+4. `npm run dashboard` - Access web monitoring interface
 
-- All code uses strict TypeScript with comprehensive type definitions
+## Key Development Patterns
+
+### Authentication System
+- Uses numeric user IDs (`AUTHORIZED_CHAT_ID`) instead of usernames for security
+- User IDs are immutable while usernames can change
+- Authorization checks are centralized and consistent across all bot implementations
+
+### Message Handling
+- All Telegram bots implement loop prevention (ignore bot messages, track message IDs)
+- Structured command system with `:h` prefix for workspace commands
+- Error handling with user-friendly messages
+
+### File Operations
+- Security filtering prevents access to sensitive files (`.env`, etc.)
+- Path validation prevents directory traversal attacks
+- File operations are logged and can be monitored via dashboard
+
+### Type Safety and Code Quality
+- Strict TypeScript with comprehensive type definitions
 - ESLint configuration enforces consistent code style
-- Jest tests provide code coverage and validation
+- Vitest tests provide code coverage and validation
 - Zod schemas validate runtime data structures
+- React dashboard uses modern TypeScript patterns
 
 The project emphasizes type safety, modularity, and clear separation of concerns between Telegram messaging, AI model integration, CLI functionality, and MCP server capabilities.
-
-## Docker Development Memories
-
-- **Docker Rebuild Command**: When making changes, force a complete rebuild:
-  ```
-  . Let me force a rebuild:
-  ⏺ Bash(docker-compose -f docker-compose.tsgram-workspace.yml down && docker build -t tsgram:latest -f Dockerfile.tsgram-workspace . --no-cache && docker-…)
-  Do this whenever you have made changes!
-  ```

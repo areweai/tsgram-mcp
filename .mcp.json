@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "signal-aichat": {
+    "tsgram": {
       "type": "stdio",
       "command": "npx",
       "args": [
