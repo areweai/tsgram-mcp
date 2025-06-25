@@ -21,7 +21,7 @@ TSGram MCP connects Claude Code sessions to Telegram using TS/Node/Docker/cli-ut
 Let Claude handle the entire setup and ask you for the required values.
 
 **From your terminal:**
-
+0. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and [Node.js 20+](https://nodejs.org/en/download) (npm included)
 1. Clone the repository:
    ```bash
    git clone https://github.com/areweai/tsgram-mcp.git
@@ -106,7 +106,8 @@ The dashboard provides:
 
 ## 📋 You Will Need
 
-- Docker Desktop
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Node.js 20+](https://nodejs.org/en/download) (npm included)
 - Telegram on a phone
 - Claude Desktop or Claude Code (CLI)
 - An OpenRouter API key (We recommend creating a new API key with a $1.00 limit. Trust, but limit!)
