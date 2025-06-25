@@ -204,7 +204,7 @@ class ClaudeDockerBridge {
       process.stdout.write(output)
       
       // Check if this is a response to a Telegram message
-      if (output.includes('[Telegram Message from @duncist]') || 
+      if (output.includes('[Telegram Message from authorized user]') || 
           this.messageHistory.size > 0) {
         // Forward to Telegram
         await this.telegramBridge.forwardResponse(output, {

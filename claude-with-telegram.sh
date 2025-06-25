@@ -14,7 +14,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}🤖 Claude Code CLI with Telegram Forwarding${NC}"
-echo -e "${YELLOW}📡 Responses will be forwarded to your telegram bot${NC}"
+echo -e "${YELLOW}📡 Responses will be forwarded to you${NC}"
 echo ""
 
 # Get the directory of this script
@@ -52,7 +52,7 @@ if claude "$@" 2>&1 | tee "$TEMP_OUTPUT"; then
         cat "$TEMP_OUTPUT"
     } | npx tsx "$SCRIPT_DIR/src/cli-telegram-bridge.ts"
     
-    echo -e "${GREEN}✅ Response forwarded to authorized Telegram user${NC}"
+    echo -e "${GREEN}✅ Response forwarded to user${NC}"
 else
     EXIT_CODE=$?
     echo ""
@@ -71,6 +71,6 @@ else
         cat "$TEMP_OUTPUT"
     } | npx tsx "$SCRIPT_DIR/src/cli-telegram-bridge.ts"
     
-    echo -e "${GREEN}✅ Error output forwarded to authorized Telegram user${NC}"
+    echo -e "${GREEN}✅ Error output forwarded to user${NC}"
     exit $EXIT_CODE
 fi

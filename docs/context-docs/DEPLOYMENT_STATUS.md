@@ -49,7 +49,7 @@
 
 ## 🛡️ Security Features
 
-1. Only @duncist can execute workspace commands
+1. Only authorized user can execute workspace commands
 2. Other users get AI chat without file access
 3. Message deduplication prevents spam
 4. Loop prevention for bot responses
