@@ -52,5 +52,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 # This provides:
 # 1. MCP Server for Claude Code integration
 # 2. HTTP Webhook for automatic AI responses
-# 3. Hermes AI chat integration
+# 3.  AI chat integration
 CMD ["npx", "tsx", "src/telegram-mcp-webhook-server.ts"]

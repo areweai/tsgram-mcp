@@ -60,10 +60,11 @@ export class TSGramAPIClient {
   private webhookUrl: string
 
   constructor() {
-    // Default to localhost - adjust if needed
-    this.baseUrl = 'http://localhost:4040'
-    this.mcpUrl = 'http://localhost:4040' 
-    this.webhookUrl = 'http://localhost:4041'
+    // Port 4040: AI-powered bot with API key info
+    // Port 4041: MCP webhook server with bot management
+    this.baseUrl = 'http://localhost:4040'      // AI bot health
+    this.mcpUrl = 'http://localhost:4041'       // MCP server
+    this.webhookUrl = 'http://localhost:4041'   // Bot management
   }
 
   async healthCheck(): Promise<SystemHealth> {
@@ -94,7 +95,7 @@ export class TSGramAPIClient {
 
   async getMCPStatus(): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}/mcp/status`)
+      const response = await fetch(`${this.mcpUrl}/mcp/status`)
       if (!response.ok) {
         throw new Error(`MCP status failed: ${response.statusText}`)
       }
@@ -202,8 +203,15 @@ export class TSGramAPIClient {
         return total + (bot.message_count || 0)
       }, 0)
 
-      // Use webhook health if main health fails
-      const systemHealth = health.status !== 'down' ? health : webhookHealth
+      // Merge data from both services
+      const systemHealth = {
+        status: webhookHealth.status,                    // Overall system status from webhook server
+        timestamp: webhookHealth.timestamp,              // Latest timestamp
+        mcp_server: webhookHealth.mcp_server,           // MCP server status from webhook server
+        ai_model: health.ai_model || 'unknown',         // AI model from AI bot service
+        has_api_key: health.has_api_key || false,       // API key status from AI bot service
+        bots: webhookHealth.bots                        // Bot count from webhook server
+      }
 
       return {
         totalBots: bots.length,

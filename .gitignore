@@ -54,3 +54,4 @@ signal-qr-code*.png
 # Except for README images
 !assets/IMG_3908.PNG
 !assets/IMG_3913.PNG
+!assets/tsgram-dashboard.png

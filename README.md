@@ -10,7 +10,9 @@ TSGram MCP connects Claude Code sessions to Telegram, enabling AI-powered code a
 - Local Docker container runs the Telegram webhook server
 - TSGram MCP server runs locally 
 - Your Claude Code or Claude Desktop runs locally and adds MCP locally
-- Create and delete bots in-app through Telegram
+- Create and delete bots in-app through Telegram, access personalized to your id
+- Modern local web dashboard to manage bots from localhost 
+- Local means local! If your computer is offline, so are your bots.
 
 ## Quick Start (2-3 Minutes)
 
@@ -87,6 +89,19 @@ Send your bot a message and ask it something about your local project!
 
 
 **⚠️ Security Note**: TSGram has basic safeguards to not list, preview, or serve .env files but it is still strongly recommended that you do not use TSGram for anything highly sensitive as third party servers are part of the transport layer.
+
+## 📊 Web Dashboard
+
+Monitor and manage your bots through the beautiful web dashboard at **http://localhost:3000**:
+
+<img src="assets/tsgram-dashboard.png" alt="TSGram Web Dashboard - Bot management interface" width="600">
+
+The dashboard provides:
+- **Real-time bot status** and activity monitoring
+- **System health** indicators (MCP server, AI model, API keys)
+- **Bot management** - create, test, and monitor Telegram bots
+- **Activity logs** - track messages, responses, and system events
+- **Quick actions** - send test messages and manage bot configurations
 
 ## 📋 You Will Need
 
@@ -229,7 +244,7 @@ Use the same Docker configuration pattern shown above, adapting the syntax for y
 ### CLI-to-Telegram Bridge
 Forward Claude Code CLI responses to Telegram:
 ```bash
-# Setup global command (will prompt for sudo password to create /usr/local/bin/claude-tg)
+# Setup global command (may prompt for sudo password to create npm global install /usr/local/bin/claude-tg)
 npm run setup
 
 # Use instead of 'claude'
