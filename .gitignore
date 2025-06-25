@@ -50,7 +50,6 @@ temp/
 # Generated QR codes and output files
 signal-qr-code*.png
 *.qr
-*.png
 # Except for README images
 !assets/IMG_3908.PNG
 !assets/IMG_3913.PNG

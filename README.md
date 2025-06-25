@@ -4,7 +4,7 @@
 
 <img src="assets/IMG_3908.PNG" alt="TSGram in action - viewing package.json" height="450">
 
-TSGram MCP connects Claude Code sessions to Telegram, enabling AI-powered code assistance directly in your Telegram chats. Ask questions about your codebase, get AI insights, and even edit files - all from Telegram on your phone!
+TSGram MCP connects Claude Code sessions to Telegram using TS/Node/Docker/cli-utils, enabling AI-powered code assistance directly in your Telegram chats. Ask questions about your codebase, get AI insights, and even edit files - all from Telegram on your phone!
 
 ## 🔒 How It Works (All Local)
 - Local Docker container runs the Telegram webhook server
@@ -46,7 +46,7 @@ The AI will handle all the setup steps for you, including:
 - Guiding you through bot registration
 - Setting up the MCP server (and allow you to extend functionality locally)
 
-**Alternative: Automated Setup Script**
+**CLI no-AI Alternative If Hitting LLM troubles: Setup Shell Script**
 Run from your project root:
 ```bash
 # One-line install (macOS/Linux)
@@ -94,7 +94,7 @@ Send your bot a message and ask it something about your local project!
 
 Monitor and manage your bots through the beautiful web dashboard at **http://localhost:3000**:
 
-<img src="assets/tsgram-dashboard.png" alt="TSGram Web Dashboard - Bot management interface" width="600">
+<img src="assets/tsgram-dashboard-1.png" alt="TSGram Web Dashboard - Bot management interface" width="600">
 
 The dashboard provides:
 - **Real-time bot status** and activity monitoring
