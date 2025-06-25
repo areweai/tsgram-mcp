@@ -30,7 +30,7 @@ coverage/
 Thumbs.db
 
 # Logs
-logs
+logs/
 *.log
 
 # Runtime data
@@ -52,5 +52,5 @@ signal-qr-code*.png
 *.qr
 *.png
 # Except for README images
-!IMG_3908.PNG
-!IMG_3913.PNG
+!assets/IMG_3908.PNG
+!assets/IMG_3913.PNG
