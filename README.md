@@ -102,6 +102,7 @@ The dashboard provides:
 - **Bot management** - create, test, and monitor Telegram bots
 - **Activity logs** - track messages, responses, and system events
 - **Quick actions** - send test messages and manage bot configurations
+- **run from local** - npm run dashboard to view (chrome recommended)
 
 ## 📋 You Will Need
 
