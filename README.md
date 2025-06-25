@@ -1,6 +1,6 @@
 # TSGram MCP 🚀
 
-**Get Claude Code talking to Telegram in 2-3 minutes!**
+**Get Claude Code in your local project talking to Telegram in 3 minutes!**
 
 <img src="assets/IMG_3908.PNG" alt="TSGram in action - viewing package.json" height="450">
 
@@ -10,11 +10,11 @@ TSGram MCP connects Claude Code sessions to Telegram using TS/Node/Docker/cli-ut
 - Local Docker container runs the Telegram webhook server
 - TSGram MCP server runs locally 
 - Your Claude Code or Claude Desktop runs locally and adds MCP locally
-- Create and delete bots in-app through Telegram, access personalized to your id
+- Create and delete bots in-app through Telegram, access limited to your telegram user id
 - Modern local web dashboard to manage bots from localhost 
 - Local means local! If your computer is offline, so are your bots.
 
-## Quick Start (2-3 Minutes)
+## Quick Start (3 Minutes)
 
 ### 🤖 AI Agent Enhanced Setup (Recommended!)
 
