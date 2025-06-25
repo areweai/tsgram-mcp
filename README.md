@@ -2,7 +2,7 @@
 
 **Get Claude Code talking to Telegram in 2-3 minutes!**
 
-<img src="IMG_3908.PNG" alt="TSGram in action - viewing package.json" height="350">
+<img src="IMG_3908.PNG" alt="TSGram in action - viewing package.json" height="450">
 
 TSGram MCP connects Claude Code sessions to Telegram, enabling AI-powered code assistance directly in your Telegram chats. Ask questions about your codebase, get AI insights, and even edit files - all from Telegram on your phone!
 
@@ -16,7 +16,9 @@ TSGram MCP connects Claude Code sessions to Telegram, enabling AI-powered code a
 
 ### 🤖 AI Agent Enhanced Setup (Recommended!)
 
-Let Claude handle the entire setup and ask you for the required values:
+Let Claude handle the entire setup and ask you for the required values.
+
+**From your terminal:**
 
 1. Clone the repository:
    ```bash
@@ -57,7 +59,7 @@ chmod +x setup.sh
 
 Send your bot a message and ask it something about your local project!
 
-<img src="IMG_3913.PNG" alt="TSGram file permissions and dangerzone mode" height="350">
+<img src="IMG_3913.PNG" alt="TSGram file permissions and dangerzone mode" height="450">
 
 
 
