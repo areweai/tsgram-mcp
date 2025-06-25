@@ -51,3 +51,6 @@ temp/
 signal-qr-code*.png
 *.qr
 *.png
+# Except for README images
+!IMG_3908.PNG
+!IMG_3913.PNG

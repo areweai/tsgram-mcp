@@ -2,13 +2,21 @@
 
 **Get Claude Code talking to Telegram in 2-3 minutes!**
 
-TSGram MCP connects Claude Code sessions to Telegram, enabling AI-powered code assistance directly in your Telegram chats. Ask questions about your codebase, get AI insights, and even edit files - all from Telegram!
+![TSGram in action - viewing package.json](IMG_3908.PNG)
+
+TSGram MCP connects Claude Code sessions to Telegram, enabling AI-powered code assistance directly in your Telegram chats. Ask questions about your codebase, get AI insights, and even edit files - all from Telegram on your phone!
+
+## 🔒 How It Works (All Local)
+- Local Docker container runs the Telegram webhook server
+- TSGram MCP server runs locally 
+- Your Claude Code or Claude Desktop runs locally and adds MCP locally
+- Create and delete bots in-app through Telegram
 
 ## Quick Start (2-3 Minutes)
 
 ### 🤖 AI Agent Enhanced Setup (Recommended!)
 
-Let Claude or your favorite AI assistant handle the entire setup:
+Let Claude handle the entire setup and ask you for the required values:
 
 1. Clone the repository:
    ```bash
@@ -24,7 +32,7 @@ Let Claude or your favorite AI assistant handle the entire setup:
 3. Initialize with `/init`
 
 4. Copy and paste this prompt:
-   > "This project readme told me that you could help me set up tsgram-mcp for claude code. Do everything from installing node modules to creating and deploying the local docker containers. Finally, when everything is deployed, remind the user how to register a new bot using their telegram account."
+   > "Help the user set up tsgram-mcp for claude code. Do everything from installing node modules to creating and deploying the local docker containers. Finally, when everything is deployed, remind the user how to register a new bot using their telegram account."
 
 The AI will handle all the setup steps for you, including:
 - Installing dependencies
@@ -49,15 +57,9 @@ chmod +x setup.sh
 
 Send your bot a message and ask it something about your local project!
 
-## 🔒 How It Works (All Local)
+![TSGram file permissions and dangerzone mode](IMG_3913.PNG)
 
-- Local Docker container runs the Telegram webhook server
-- Management UI runs locally
-- TSGram MCP server runs locally and connects to Docker
-- Your Claude Code or Claude Desktop runs locally and uses MCP tools
-- All processing and forwarding happens locally, on your computer
-- Create and delete bots in-app through Telegram
-- The only external calls are to Telegram API and AI models selected from your approved model list
+
 
 **⚠️ Security Note**: TSGram has basic safeguards to not list, preview, or serve .env files but it is still strongly recommended that you do not use TSGram for anything highly sensitive as third party servers are part of the transport layer.
 
