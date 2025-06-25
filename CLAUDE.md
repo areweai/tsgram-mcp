@@ -32,7 +32,6 @@ TSGram MCP (`tsgram-mcp`) is a TypeScript/Node.js system that enables communicat
 - Real-time monitoring of bots and services
 
 #### Signal System (Archived)
-- Located in `/docs/signal/` directory (completely non-functional)
 - See `/docs/signal/BLOCKED_UNTIL_SIGNAL_FIXES_MANUAL_QR.md` for details
 - Signal integration abandoned due to platform limitations
 
@@ -191,11 +190,11 @@ npm run update-context        # Update AI context files
 
 **Required:**
 - `TELEGRAM_BOT_TOKEN`: Bot token from @BotFather
-- `AUTHORIZED_CHAT_ID`: **Numeric user ID** from @userinfobot (e.g., `123456789`)
+- `AUTHORIZED_CHAT_ID`: **Your Numeric user ID** from [@userBotInfoBot](https://t.me/userbotinfobot)
 
 **AI Provider (choose one):**
-- `OPENROUTER_API_KEY`: OpenRouter API key for Claude access (recommended)
-- `OPENAI_API_KEY`: OpenAI API key for GPT models
+- `OPENROUTER_API_KEY`: OpenRouter API key for multi-model access (recommended)
+- `OPENAI_API_KEY`: OpenAI API key for GPT models (optional)
 
 **Optional:**
 - `DISABLED_MODELS`: Comma-separated list of models to disable
@@ -207,7 +206,7 @@ npm run update-context        # Update AI context files
 - `NODE_ENV`: Environment (development/production)
 - `LOG_LEVEL`: Logging level (info/debug/error)
 
-**Security Note**: `AUTHORIZED_CHAT_ID` must be a numeric user ID (not username) for security. Get it from [@userinfobot](https://t.me/userinfobot) on Telegram.
+**Security Note**: `AUTHORIZED_CHAT_ID` must be a numeric user ID (not username) for security. Get it from [@userBotInfoBot](https://t.me/userbotinfobot) on Telegram.
 
 ### Configuration Files
 
