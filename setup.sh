@@ -2,7 +2,7 @@
 
 # TSGram-Claude Automated Setup Script
 # Downloads and configures a complete Telegram → Claude Code AI assistant
-# Usage: curl -sSL https://raw.githubusercontent.com/DDunc/tsgram-mcp/main/setup.sh | bash
+# Usage: curl -sSL https://raw.githubusercontent.com/areweai/tsgram-mcp/main/setup.sh | bash
 
 set -e
 
@@ -16,7 +16,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-REPO_URL="https://github.com/DDunc/tsgram-mcp.git"
+REPO_URL="https://github.com/areweai/tsgram-mcp.git"
 PROJECT_NAME="tsgram-mcp"
 SETUP_DIR="$HOME/tsgram-mcp"
 CLAUDE_CONFIG_DIR="$HOME/Library/Application Support/Claude"
@@ -498,7 +498,7 @@ show_completion_message() {
     echo "   • Start: cd $SETUP_DIR/$PROJECT_NAME && docker-compose -f docker-compose.tsgram-workspace.yml up -d"
     echo "   • Logs: cd $SETUP_DIR/$PROJECT_NAME && docker-compose -f docker-compose.tsgram-workspace.yml logs -f"
     echo ""
-    echo "🆘 Support: https://github.com/DDunc/tsgram-mcp/issues"
+    echo "🆘 Support: https://github.com/areweai/tsgram-mcp/issues"
     echo ""
     echo "🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉"
 }
@@ -513,7 +513,7 @@ handle_error() {
     echo "   3. Verify Telegram bot token"
     echo "   4. Check logs: docker-compose logs"
     echo ""
-    echo "💬 Get help: https://github.com/DDunc/tsgram-mcp/issues"
+    echo "💬 Get help: https://github.com/areweai/tsgram-mcp/issues"
     exit 1
 }
 

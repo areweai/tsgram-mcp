@@ -22,7 +22,7 @@ Let Claude handle the entire setup and ask you for the required values.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/DDunc/tsgram-mcp.git
+   git clone https://github.com/areweai/tsgram-mcp.git
    cd tsgram-mcp
    ```
 
@@ -42,17 +42,40 @@ The AI will handle all the setup steps for you, including:
 - Building Docker containers
 - Starting services
 - Guiding you through bot registration
+- Setting up the MCP server (and allow you to extend functionality locally)
 
 **Alternative: Automated Setup Script**
+Run from your project root:
 ```bash
 # One-line install (macOS/Linux)
-curl -sSL https://raw.githubusercontent.com/DDunc/tsgram-mcp/main/setup.sh | bash
+curl -sSL https://raw.githubusercontent.com/areweai/tsgram-mcp/main/setup.sh | bash
 
 # Or if you prefer to review first:
-curl -sSL https://raw.githubusercontent.com/DDunc/tsgram-mcp/main/setup.sh > setup.sh
+curl -sSL https://raw.githubusercontent.com/areweai/tsgram-mcp/main/setup.sh > setup.sh
 chmod +x setup.sh
 ./setup.sh
 ```
+
+**Adding TSGram to an Existing Project:**
+
+If you already have a project and want to add TSGram as an MCP server:
+
+1. From your existing project root:
+   ```bash
+   git clone https://github.com/areweai/tsgram-mcp.git .tsgram-mcp
+   cd .tsgram-mcp
+   ```
+
+2. Use Claude to set it up:
+   ```bash
+   claude model --sonnet
+   /init
+   ```
+
+3. Paste this prompt:
+   > "I want to add TSGram MCP to my existing project in the parent directory. Set up the Docker containers and MCP configuration so I can use Telegram to interact with my project files. The project root is one level up from here."
+
+This will configure TSGram to work with your existing project structure (and allow you to extend functionality locally).
 
 ### Test Your Bot! 🎉
 **IMPORTANT: You will need to message your bot first before it can message you.**
