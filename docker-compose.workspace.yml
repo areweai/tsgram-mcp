@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   # MCP Workspace with rsync and file editing

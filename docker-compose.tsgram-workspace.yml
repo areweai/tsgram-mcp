@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Enhanced TSGram MCP with workspace and rsync
   tsgram-mcp-workspace:

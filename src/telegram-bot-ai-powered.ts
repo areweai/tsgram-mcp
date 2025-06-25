@@ -21,7 +21,8 @@ import { SyncSafetyManager } from './utils/sync-safety.js'
 dotenv.config()
 
 const WORKSPACE_PATH = process.env.WORKSPACE_PATH || '/app/workspaces/tsgram'
-const AUTHORIZED_USER = process.env.AUTHORIZED_USER || 'duncanist'
+// Authorization now uses AUTHORIZED_CHAT_ID only (more secure than usernames)
+const AUTHORIZED_CHAT_ID = process.env.AUTHORIZED_CHAT_ID ? parseInt(process.env.AUTHORIZED_CHAT_ID) : null
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
 const OPENROUTER_MODEL = 'anthropic/claude-3.5-sonnet'
 const DEFAULT_FILE_EDITS = process.env.ALLOW_FILE_EDITS === 'true'
@@ -96,7 +97,7 @@ class AIPoweredTelegramBot {
     this.app.get('/config', (req, res) => {
       res.json({
         workspace_path: WORKSPACE_PATH,
-        authorized_user: AUTHORIZED_USER,
+        authorized_chat_id: AUTHORIZED_CHAT_ID,
         file_edits_enabled: this.fileEditsEnabled,
         model: OPENROUTER_MODEL,
         default_file_edits: DEFAULT_FILE_EDITS
@@ -166,7 +167,7 @@ class AIPoweredTelegramBot {
       this.bot.bot_info = result.data
       this.botUserId = result.data.id
       console.log('🤖 Bot user ID:', this.botUserId)
-      console.log('🔒 Authorized user:', AUTHORIZED_USER)
+      console.log('🔒 Authorized chat ID:', AUTHORIZED_CHAT_ID)
       console.log('🧠 AI Model:', OPENROUTER_MODEL)
       this.startPolling()
     }
@@ -329,9 +330,19 @@ class AIPoweredTelegramBot {
       return
     }
 
-    // Authorization check for file operations
-    if (username.toLowerCase() !== AUTHORIZED_USER.toLowerCase()) {
-      await this.sendMessage(chatId, `⛔ Sorry @${username}, only @${AUTHORIZED_USER} can interact with this bot.`)
+    // Authorization check - now uses chat ID for security
+    if (!AUTHORIZED_CHAT_ID) {
+      await this.sendMessage(chatId, `⚠️ Bot authorization not configured. Please set AUTHORIZED_CHAT_ID environment variable to your Telegram user ID.
+
+To get your Telegram user ID:
+1. Message @userinfobot on Telegram
+2. It will reply with your user ID
+3. Set AUTHORIZED_CHAT_ID=<your_user_id> in your .env file`)
+      return
+    }
+
+    if (chatId !== AUTHORIZED_CHAT_ID) {
+      await this.sendMessage(chatId, `⛔ Sorry, you are not authorized to use this bot.`)
       return
     }
 
@@ -873,7 +884,7 @@ Provide a helpful explanation or insights about this output. If it's a file list
     this.app.listen(this.port, () => {
       console.log(`🌐 Server on port ${this.port}`)
       console.log('✅ AI-Powered bot started!')
-      console.log('🔒 Authorized user:', AUTHORIZED_USER)
+      console.log('🔒 Authorized chat ID:', AUTHORIZED_CHAT_ID)
       console.log('🧠 Using Claude Sonnet via OpenRouter')
       console.log('📝 Natural language file editing enabled')
       console.log('⌨️  :h commands supported')

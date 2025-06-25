@@ -1,4 +1,3 @@
-version: "3.9"
 
 # Remote deployment configuration for Linux servers
 # Optimized for x86_64 architecture with multi-stage builds

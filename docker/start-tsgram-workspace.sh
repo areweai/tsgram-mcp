@@ -2,7 +2,7 @@
 
 # Start script for Hermes MCP with workspace capabilities
 echo "🚀 Starting Hermes MCP Workspace Server..."
-echo "🔒 Authorized user: @${AUTHORIZED_USER} (${AUTHORIZED_CHAT_ID})"
+echo "🔒 Authorized chat ID: ${AUTHORIZED_CHAT_ID}"
 
 # Start rsync daemon
 echo "📡 Starting rsync daemon..."
@@ -42,7 +42,7 @@ mkdir -p /app/data
 
 # Only create README if it doesn't exist
 if [ ! -f "$WORKSPACE_PATH/README.md" ]; then
-    echo "# $PROJECT_NAME workspace ready for @${AUTHORIZED_USER}" > "$WORKSPACE_PATH/README.md"
+    echo "# $PROJECT_NAME workspace ready" > "$WORKSPACE_PATH/README.md"
 fi
 
 echo "📁 Project: $PROJECT_NAME"

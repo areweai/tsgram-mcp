@@ -1,5 +1,3 @@
-version: "3.9"
-
 # Local development configuration for Apple Silicon Mac
 # Optimized for arm64 architecture with development features
 

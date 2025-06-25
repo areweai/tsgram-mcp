@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Telegram to Claude Bridge
   telegram-to-claude-bridge:

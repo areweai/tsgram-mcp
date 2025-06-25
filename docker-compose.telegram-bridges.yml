@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   # Telegram to Claude Bridge - receives messages from Telegram
