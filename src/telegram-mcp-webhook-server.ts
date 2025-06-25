@@ -828,7 +828,7 @@ class TelegramMCPWebhookServer {
 
     try {
       await this.createBot({
-        name: 'Default Hermes MCP Bot',
+        name: 'Telegram Bot',
         token: token,
       })
       return this.getDefaultBot()
