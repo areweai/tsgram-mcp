@@ -13,6 +13,12 @@
 import { execSync, spawn } from 'child_process'
 import { CLITelegramBridge } from './cli-telegram-bridge.js'
 import readline from 'readline'
+import dotenv from 'dotenv'
+
+dotenv.config()
+
+// Authorization configuration
+const AUTHORIZED_CHAT_ID = process.env.AUTHORIZED_CHAT_ID ? parseInt(process.env.AUTHORIZED_CHAT_ID) : null
 
 interface MessageHistory {
   chatId: number
@@ -49,7 +55,7 @@ class ClaudeDockerBridge {
     }
 
     console.log('✅ Docker container is healthy')
-    console.log('📱 Monitoring Telegram messages for @duncist')
+    console.log(`📱 Monitoring Telegram messages for chat ID: ${AUTHORIZED_CHAT_ID}`)
     console.log('🤖 Claude responses will be forwarded to Telegram')
     console.log('\nPress Ctrl+C to stop\n')
 
@@ -87,24 +93,25 @@ class ClaudeDockerBridge {
         // Get recent logs
         const logs = execSync('docker logs hermes-mcp-server --tail 20 2>&1', { encoding: 'utf8' })
         
-        // Parse for new messages from @duncist
-        const messagePattern = /💬 Message from duncanist \((\d+)\): (.+)/g
+        // Parse for new messages from authorized chat ID
+        const messagePattern = new RegExp(`💬 Message from \\w+ \\(${AUTHORIZED_CHAT_ID}\\): (.+)`, 'g')
         let match
         
         while ((match = messagePattern.exec(logs)) !== null) {
-          const [_, chatId, message] = match
-          const chatIdNum = parseInt(chatId)
+          const [_, message] = match
+          
+          if (!AUTHORIZED_CHAT_ID) continue
           
           // Check if this is a new message
-          if (this.shouldProcessMessage(chatIdNum, message)) {
-            console.log(`\n📨 New message from @duncist: "${message}"`)
+          if (this.shouldProcessMessage(AUTHORIZED_CHAT_ID, message)) {
+            console.log(`\n📨 New message from authorized user: "${message}"`)
             
             // Add to history
-            this.addToHistory(chatIdNum, 'duncanist', 'user', message)
+            this.addToHistory(AUTHORIZED_CHAT_ID, 'authorized_user', 'user', message)
             
             // Inject into Claude session if active
             if (this.claudeProcess) {
-              const contextPrompt = this.buildContextPrompt(chatIdNum, message)
+              const contextPrompt = this.buildContextPrompt(AUTHORIZED_CHAT_ID, message)
               this.claudeProcess.stdin.write(contextPrompt + '\n')
             }
           }
@@ -161,7 +168,7 @@ class ClaudeDockerBridge {
   private buildContextPrompt(chatId: number, newMessage: string): string {
     const history = this.messageHistory.get(chatId)
     
-    let prompt = `[Telegram Message from @duncist]\n`
+    let prompt = `[Telegram Message from authorized user]\n`
     
     // Add recent context if available
     if (history && history.messages.length > 1) {
@@ -206,8 +213,9 @@ class ClaudeDockerBridge {
         })
         
         // Add to history
-        const chatId = 5988959818 // @duncist's chat ID
-        this.addToHistory(chatId, 'claude', 'assistant', output.trim())
+        if (AUTHORIZED_CHAT_ID) {
+          this.addToHistory(AUTHORIZED_CHAT_ID, 'claude', 'assistant', output.trim())
+        }
       }
     })
 

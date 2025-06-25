@@ -30,8 +30,8 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - AUTHORIZED_USER=duncanist
-      - AUTHORIZED_CHAT_ID=5988959818
+      # AUTHORIZED_CHAT_ID should be set in your .env file
+      - AUTHORIZED_CHAT_ID=${AUTHORIZED_CHAT_ID}
       - DEFAULT_MODEL=openrouter
       - CLEAR_MESSAGE_HISTORY=true
     extra_hosts:

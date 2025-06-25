@@ -57,7 +57,7 @@ class TelegramToClaudeBridge {
       webhook_port: parseInt(process.env.TG_CLAUDE_WEBHOOK_PORT || '4041'),
       webhook_path: '/telegram-to-claude-webhook',
       claude_pipe_path: '/tmp/claude-telegram-pipe',
-      allowed_chat_ids: [5988959818], // @duncist's chat ID
+      allowed_chat_ids: process.env.AUTHORIZED_CHAT_ID ? [parseInt(process.env.AUTHORIZED_CHAT_ID)] : [],
       session_timeout_ms: 30 * 60 * 1000 // 30 minutes
     }
 

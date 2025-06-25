@@ -174,8 +174,9 @@ class TelegramClaudeQueue {
     const username = message.from?.username || 'unknown'
     const text = message.text
 
-    // Only process messages from @duncist
-    if (username !== 'duncist' && chatId !== 5988959818) {
+    // Only process messages from authorized user
+    const AUTHORIZED_CHAT_ID = process.env.AUTHORIZED_CHAT_ID ? parseInt(process.env.AUTHORIZED_CHAT_ID) : null
+    if (chatId !== AUTHORIZED_CHAT_ID) {
       console.log(`⚠️  Ignoring message from ${username}`)
       return
     }

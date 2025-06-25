@@ -155,8 +155,7 @@ docker-compose -f docker-compose.tsgram-workspace.yml up -d
 ### Environment Variables (.env file)
 
 - `TELEGRAM_BOT_TOKEN`: Bot token from BotFather
-- `AUTHORIZED_USER`: Telegram username authorized to use bot
-- `AUTHORIZED_CHAT_ID`: Telegram chat ID for bot communication
+- `AUTHORIZED_CHAT_ID`: Telegram user ID authorized to use bot (more secure than usernames)
 - `DISABLED_MODELS`: Comma-separated list of models to disable
 - `DEFAULT_MODEL`: Model to use when no trigger is specified
 - `OPENAI_API_KEY`: OpenAI API key for GPT models

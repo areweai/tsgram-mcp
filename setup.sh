@@ -221,7 +221,7 @@ generate_env_file() {
     cat > .env << EOF
 # Telegram Configuration
 TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
-AUTHORIZED_USER=$TELEGRAM_USERNAME
+# Authorization now uses AUTHORIZED_CHAT_ID only (more secure than usernames)
 AUTHORIZED_CHAT_ID=$TELEGRAM_CHAT_ID
 
 # AI Model Configuration
