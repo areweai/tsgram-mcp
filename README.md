@@ -34,7 +34,7 @@ Let Claude handle the entire setup and ask you for the required values.
 3. Initialize with `/init`
 
 4. Copy and paste this prompt:
-   > "Help the user set up tsgram-mcp for claude code. Do everything from installing node modules to creating and deploying the local docker containers. Finally, when everything is deployed, remind the user how to register a new bot using their telegram account."
+   > "First, explain to the human how to register a new Telegram bot with @BotFather and get their bot token (TELEGRAM_BOT_TOKEN), and how to get their Telegram user ID from @userinfobot (for AUTHORIZED_CHAT_ID). They can work on getting these credentials while you set up the system. Then help the user set up tsgram-mcp for claude code. Do everything from installing node modules to creating and deploying the local docker containers. Finally, when everything is deployed, remind the user to configure their bot token and authorized chat ID along wither other required .env variables."
 
 The AI will handle all the setup steps for you, including:
 - Installing dependencies
@@ -73,7 +73,7 @@ If you already have a project and want to add TSGram as an MCP server:
    ```
 
 3. Paste this prompt:
-   > "I want to add TSGram MCP to my existing project in the parent directory. Set up the Docker containers and MCP configuration so I can use Telegram to interact with my project files. The project root is one level up from here."
+   > "First, explain to the human how to register a new Telegram bot with @BotFather and get their bot token (TELEGRAM_BOT_TOKEN), and how to get their Telegram user ID from @userinfobot (for AUTHORIZED_CHAT_ID). They can work on getting these credentials while you set up the system. Then help me add TSGram MCP to my existing project in the parent directory. Set up the Docker containers and MCP configuration so I can use Telegram to interact with my project files. The project root is one level up from here."
 
 This will configure TSGram to work with your existing project structure (and allow you to extend functionality locally).
 
@@ -98,24 +98,31 @@ Send your bot a message and ask it something about your local project!
 
 ## Manual Setup Steps
 
-### 1. Get Your Bot Token
-1. Message [@BotFather](https://t.me/botfather) on Telegram
+### 1. Get Your Bot Token & User ID
+1. **Create Bot**: Message [@BotFather](https://t.me/botfather) on Telegram
 2. Send `/newbot` and follow prompts
-3. Copy your bot token
-4. Get your Telegram user ID: Message [@userinfobot](https://t.me/userinfobot)
+3. Copy your bot token (keep this secret!)
+4. **Get Your User ID** (IMPORTANT): Message [@userinfobot](https://t.me/userinfobot)
+   - This returns your numeric user ID (e.g., `123456789`)
+   - **Use the user ID, NOT your username** for security (usernames can be changed)
 
 ### 2. Configure Environment
 Edit `.env` with your values:
 ```env
 TELEGRAM_BOT_TOKEN=your_bot_token_here
-AUTHORIZED_USER=your_telegram_username
-AUTHORIZED_CHAT_ID=your_telegram_user_id
+# CRITICAL: Use your numeric user ID from @userinfobot, not your username!
+AUTHORIZED_CHAT_ID=123456789  # Your numeric user ID from step 1
 
 # Choose ONE AI provider:
 OPENROUTER_API_KEY=your_openrouter_key  # For Claude (recommended with $1 limit)
 # OR
 OPENAI_API_KEY=your_openai_key         # For GPT-4
 ```
+
+**Security Note**: The bot now uses your **numeric user ID** instead of username for authorization. This is more secure because:
+- User IDs never change
+- Usernames can be changed by users
+- User IDs cannot be guessed or easily discovered
 
 ### 3. Start TSGram
 ```bash
@@ -197,18 +204,33 @@ Add to your Claude Code MCP settings:
     "command": "docker",
     "args": ["exec", "-i", "tsgram-mcp-workspace", "npx", "tsx", "src/mcp-server.ts"],
     "env": {
-      "TELEGRAM_BOT_TOKEN": "your_token",
-      "AUTHORIZED_CHAT_ID": "your_chat_id"
+      "TELEGRAM_BOT_TOKEN": "your_bot_token_here",
+      "AUTHORIZED_CHAT_ID": "123456789"
     }
   }
 }
 ```
 
+**Note**: Replace `123456789` with your actual numeric user ID from [@userinfobot](https://t.me/userinfobot)
+
+### MCP Compatibility
+
+TSGram uses the standard Model Context Protocol (MCP) format and should be compatible with any MCP-supporting IDE or tool. **Tested with:**
+- ✅ Claude Code CLI
+- ✅ Claude Desktop
+
+**Should work with** (standard MCP format):
+- Cursor IDE
+- GitHub Copilot
+- Other MCP-compatible editors
+
+Use the same Docker configuration pattern shown above, adapting the syntax for your specific MCP client.
+
 ### CLI-to-Telegram Bridge
 Forward Claude Code CLI responses to Telegram:
 ```bash
-# Setup global command
-sudo npm run setup
+# Setup global command (will prompt for sudo password to create /usr/local/bin/claude-tg)
+npm run setup
 
 # Use instead of 'claude'
 claude-tg "analyze this codebase"
@@ -226,9 +248,11 @@ npm run docker:logs
 ```
 
 **Can't connect to bot?**
-1. Verify bot token in `.env`
-2. Check your username/chat ID
+1. Verify bot token is correct in `.env`
+2. **Check your user ID**: Make sure `AUTHORIZED_CHAT_ID` is your numeric user ID (not username)
+   - Get it from [@userinfobot](https://t.me/userinfobot) if unsure
 3. Make sure you messaged the bot first
+4. If you get "authorization not configured" error, set `AUTHORIZED_CHAT_ID` in your `.env` file
 
 **File edits not working?**
 - Type `:dangerzone` to enable (one-time)

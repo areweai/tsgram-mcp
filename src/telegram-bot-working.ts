@@ -18,7 +18,7 @@ import { ChatModel } from './models/ChatModel.js'
 dotenv.config()
 
 const WORKSPACE_PATH = process.env.WORKSPACE_PATH || '/app/workspace'
-const AUTHORIZED_USER = process.env.AUTHORIZED_USER || 'duncist'
+const AUTHORIZED_USER = process.env.AUTHORIZED_USER || 'set_your_username_in_local_env_file'
 
 interface BotInstance {
   id: string

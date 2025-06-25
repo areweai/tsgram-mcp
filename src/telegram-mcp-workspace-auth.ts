@@ -4,7 +4,7 @@
  * TELEGRAM MCP WORKSPACE SERVER WITH AUTH
  * 
  * Enhanced version that:
- * 1. Only accepts commands from @duncist
+ * 1. Only accepts commands from authorized user (configured via AUTHORIZED_CHAT_ID)
  * 2. Provides workspace file editing with rsync
  * 3. Maintains all existing Hermes MCP features
  * 4. Auto-responds to messages with AI
@@ -28,9 +28,8 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-// Authorization config
-const AUTHORIZED_USER = process.env.AUTHORIZED_USER || 'duncist'
-const AUTHORIZED_CHAT_ID = parseInt(process.env.AUTHORIZED_CHAT_ID || '5988959818')
+// Authorization config - using user ID only for security (usernames can be changed)
+const AUTHORIZED_CHAT_ID = process.env.AUTHORIZED_CHAT_ID ? parseInt(process.env.AUTHORIZED_CHAT_ID) : null
 const WORKSPACE_PATH = process.env.WORKSPACE_PATH || '/app/workspace'
 
 class TelegramMCPWorkspaceAuth {
@@ -69,7 +68,7 @@ class TelegramMCPWorkspaceAuth {
       res.json({
         status: 'healthy',
         service: 'hermes-mcp-workspace',
-        authorized_user: AUTHORIZED_USER,
+        authorized_chat_id: AUTHORIZED_CHAT_ID,
         workspace: WORKSPACE_PATH,
         timestamp: new Date().toISOString()
       })
@@ -146,8 +145,19 @@ class TelegramMCPWorkspaceAuth {
     console.log(`💬 Message from @${username} (${chatId}): ${text}`)
 
     // Check authorization
-    if (username !== AUTHORIZED_USER && chatId !== AUTHORIZED_CHAT_ID) {
-      console.log(`⛔ Unauthorized user: @${username}`)
+    if (!AUTHORIZED_CHAT_ID) {
+      console.log(`⚠️  No AUTHORIZED_CHAT_ID configured`)
+      await this.sendMessage(chatId, `⚠️ Bot authorization not configured. Please set AUTHORIZED_CHAT_ID environment variable to your Telegram user ID.
+
+To get your Telegram user ID:
+1. Message @userinfobot on Telegram
+2. It will reply with your user ID
+3. Set AUTHORIZED_CHAT_ID=<your_user_id> in your .env file`)
+      return
+    }
+
+    if (chatId !== AUTHORIZED_CHAT_ID) {
+      console.log(`⛔ Unauthorized user: @${username} (ID: ${chatId})`)
       await this.sendMessage(chatId, '⛔ Sorry, you are not authorized to use this bot.')
       return
     }
@@ -307,7 +317,7 @@ Regular messages get AI responses.`)
 📁 Path: ${WORKSPACE_PATH}
 📄 Files: ${files.length}
 💾 Size: ${(totalSize / 1024 / 1024).toFixed(2)} MB
-🔒 User: @${AUTHORIZED_USER}
+🔒 Chat ID: ${AUTHORIZED_CHAT_ID}
 ✅ Rsync: Active
 🔄 Auto-sync: Enabled`)
   }
@@ -388,7 +398,7 @@ Regular messages get AI responses.`)
     console.log('🤖 MCP Server connected')
 
     console.log('✅ Hermes MCP Workspace Server started!')
-    console.log(`🔒 Authorized user: @${AUTHORIZED_USER}`)
+    console.log(`🔒 Authorized chat ID: ${AUTHORIZED_CHAT_ID || 'NOT CONFIGURED'}`)
   }
 }
 

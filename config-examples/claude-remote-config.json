@@ -1,15 +1,11 @@
 {
   "mcpServers": {
-    "hermes-remote": {
-      "command": "curl",
-      "args": [
-        "-X", "POST",
-        "http://localhost:3000/mcp",
-        "-H", "Content-Type: application/json",
-        "-d", "@-"
-      ],
+    "tsgram": {
+      "command": "docker",
+      "args": ["exec", "-i", "tsgram-mcp-workspace", "npx", "tsx", "src/mcp-server.ts"],
       "env": {
-        "HERMES_ENDPOINT": "http://localhost:3000"
+        "TELEGRAM_BOT_TOKEN": "your_bot_token_here",
+        "AUTHORIZED_CHAT_ID": "your_telegram_user_id_here"
       }
     }
   }

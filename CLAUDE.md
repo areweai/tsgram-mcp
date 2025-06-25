@@ -79,8 +79,7 @@ All CLI responses are automatically filtered to remove:
 ### Target Configuration
 
 Responses are sent to:
-- **User**: @duncist
-- **Chat ID**: 5988959818
+- **Chat ID**: Configured via `AUTHORIZED_CHAT_ID` environment variable
 - **Format**: Professional MCP-branded messages
 
 ### Integration with Claude Code

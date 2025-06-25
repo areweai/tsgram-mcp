@@ -35,8 +35,8 @@ class CLITelegramBridge {
   constructor() {
     this.config = {
       telegram_bot_token: process.env.TELEGRAM_BOT_TOKEN || '',
-      target_chat_id: 5988959818, // @duncanist's chat ID
-      target_username: '@duncist',
+      target_chat_id: process.env.AUTHORIZED_CHAT_ID ? parseInt(process.env.AUTHORIZED_CHAT_ID) : 0,
+      target_username: '', // No longer used - user ID is more secure
       enabled: true
     }
 
@@ -49,6 +49,12 @@ class CLITelegramBridge {
   private async initializeBot() {
     if (!this.config.telegram_bot_token) {
       console.error('❌ No Telegram bot token found')
+      return
+    }
+
+    if (!this.config.target_chat_id || this.config.target_chat_id === 0) {
+      console.error('❌ No AUTHORIZED_CHAT_ID configured. Please set your Telegram user ID in the environment.')
+      console.error('   Get your user ID by messaging @userinfobot on Telegram')
       return
     }
 
@@ -145,7 +151,7 @@ class CLITelegramBridge {
       formatted += `**Time**: ${new Date(metadata.timestamp).toLocaleTimeString()}\n`
     }
     
-    formatted += `**Target**: ${this.config.target_username}\n\n`
+    formatted += `**Target ID**: ${this.config.target_chat_id}\n\n`
     formatted += `---\n\n`
     
     // Add the filtered content
@@ -187,7 +193,7 @@ class CLITelegramBridge {
       })
 
       if (result.success) {
-        console.log(`✅ CLI response forwarded to ${this.config.target_username}`)
+        console.log(`✅ CLI response forwarded to chat ID ${this.config.target_chat_id}`)
         return true
       } else {
         console.error(`❌ Failed to forward CLI response: ${result.error}`)
