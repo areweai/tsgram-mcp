@@ -30,15 +30,21 @@ Let Claude handle the entire setup and ask you for the required values.
 
 2. From the command line, start Claude:
    ```bash
-   claude model --sonnet
+   claude --model sonnet
    ```
 
 3. Initialize with `/init`
 
 4. Copy and paste this prompt:
-   > "First, explain to the human how to register a new Telegram bot with @BotFather and get their bot token (TELEGRAM_BOT_TOKEN), and how to get their Telegram user ID from @userinfobot (for AUTHORIZED_CHAT_ID). They can work on getting these credentials while you set up the system. Then help the user set up tsgram-mcp for claude code. Do everything from installing node modules to creating and deploying the local docker containers. Finally, when everything is deployed, remind the user to configure their bot token and authorized chat ID along wither other required .env variables."
+   > First, explain to the human how to register a new Telegram bot with @BotFather and get their bot token (TELEGRAM_BOT_TOKEN), and how to get their Telegram user ID from @userinfobot (for AUTHORIZED_CHAT_ID). They can work on getting these credentials while you set up the system. Then help the user set up tsgram-mcp for claude code. Do everything from installing node modules to creating and deploying the local docker containers. Finally, when everything is deployed, remind the user to configure their bot token and authorized chat ID along wither other required .env variables.
 
-The AI will handle all the setup steps for you, including:
+Make sure you replace the `TELEGRAM_BOT_TOKEN` and `AUTHORIZED_CHAT_ID` placeholders with the actual values.
+
+In order to retrieve those values, you will have to message the following Telegram bots and follow their instructions:
+- [@BotFather](https://t.me/botfather)
+- [@userinfobot](https://t.me/userinfobot)
+
+The AI will then handle all the setup steps for you, including:
 - Installing dependencies
 - Configuring environment variables
 - Building Docker containers
